@@ -44,20 +44,21 @@ class OffsetCalculatorPanel(wx.Panel):
             num1 = float(self.entry1.GetValue())
             num2 = float(self.entry2.GetValue())
             num3 = float(self.entry3.GetValue())
-            Left_offset = ((0 -(num1 / 2)) + num3 + (num2 / 2))
-            Right_offset = ((0 +((num1 / 2))) + num3 - (num2 / 2))
+            Left_offset = round((0 - (num1 / 2)) + num3 + (num2 / 2), 2)
+            Right_offset = round((0 + (num1 / 2)) + num3 - (num2 / 2), 2)
+
 
             # Determine the message for the left offset
             if Left_offset > 0:
-                left_message = f"Left in {math.floor(Left_offset)}"
+                left_message = f"Left in {(Left_offset)}"
             else:
-                left_message = f"Left out {math.floor(abs(Left_offset))}"
+                left_message = f"Left out {(abs(Left_offset))}"
 
             # Determine the message for the right offset
             if Right_offset > 0:
-                right_message = f"Right out {math.floor(Right_offset)}"
+                right_message = f"Right out {(Right_offset)}"
             else:
-                right_message = f"Right in {math.floor(abs(Right_offset))}"
+                right_message = f"Right in {(abs(Right_offset))}"
 
             wx.MessageBox(f"{left_message}\n{right_message}", "Offset", wx.OK | wx.ICON_INFORMATION)
         except ValueError:
