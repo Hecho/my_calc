@@ -26,7 +26,7 @@ icon.filename = icon.png
 source.dir = .
 
 # (optional) Source code files (relative to source.dir)
-source.include_exts = py,png,jpg,kv,atlas
+source.include_exts = py,png
 
 # (optional) Additional files and folders to include (relative to the source directory)
 # source.include_patterns = data/*,extra_files/*.txt
@@ -49,7 +49,7 @@ source.include_exts = py,png,jpg,kv,atlas
 # (optional) Application entry point (main Python file)
 # You should set this to the main Python file of your Kivy application
 # For example: main.py, full_calc.py, etc.
-entry_point = full_calc.py
+entry_point = main.py
 
 # (optional) Presplash image (should be in the same directory as this file)
 # presplash.filename = presplash.png
