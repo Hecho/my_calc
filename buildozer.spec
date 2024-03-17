@@ -14,10 +14,10 @@ numeric.version = 1
 version = 1
 
 # (optional) Application author's name
-author = HPaul Sweeney
+author = Paul Sweeney
 
 # (optional) Application author's email
-author.email = ypsweeney.ps@gmail.com
+author.email = psweeney.ps@gmail.com
 
 # (optional) Application icon (should be in the same directory as this file)
 icon.filename = icon.png
