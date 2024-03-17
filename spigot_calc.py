@@ -1,39 +1,35 @@
-import wx
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
+from kivy.uix.popup import Popup
 import math
 
-class SpigotCalculatorPanel(wx.Panel):
-    def __init__(self, parent):
-        super(SpigotCalculatorPanel, self).__init__(parent)
+class SpigotCalculatorPanel(BoxLayout):
+    def __init__(self, **kwargs):
+        super(SpigotCalculatorPanel, self).__init__(**kwargs)
+        self.orientation = 'vertical'
+        self.padding = [0, 200]  # Adding padding between children vertically
 
-        self.label1 = wx.StaticText(self, label="Enter number of spigots:")
-        self.entry1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        
-        self.label2 = wx.StaticText(self, label="Enter size of lid:")
-        self.entry2 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        
-        self.calculate_button = wx.Button(self, label="Calculate")
-        self.calculate_button.Bind(wx.EVT_BUTTON, self.calculate)
+        self.label1 = Label(text="Enter number of spigots:")
+        self.entry1 = TextInput(multiline=False, input_type='number')
 
-        # Bind the Enter key in entry1 to move focus to entry2
-        self.entry1.Bind(wx.EVT_TEXT_ENTER, lambda event: self.entry2.SetFocus())
+        self.label2 = Label(text="Enter size of lid:")
+        self.entry2 = TextInput(multiline=False, input_type='number')
 
-        # Bind the Enter key press in the last TextCtrl to the calculate method
-        self.entry2.Bind(wx.EVT_TEXT_ENTER, self.calculate)
+        self.calculate_button = Button(text="Calculate")
+        self.calculate_button.bind(on_press=self.calculate)
 
-        self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.sizer.Add(self.label1, 0, wx.ALL, 5)
-        self.sizer.Add(self.entry1, 0, wx.EXPAND|wx.ALL, 5)
-        self.sizer.Add(self.label2, 0, wx.ALL, 5)
-        self.sizer.Add(self.entry2, 0, wx.EXPAND|wx.ALL, 5)
-        self.sizer.Add(self.calculate_button, 0, wx.ALL, 5)
+        self.add_widget(self.label1)
+        self.add_widget(self.entry1)
+        self.add_widget(self.label2)
+        self.add_widget(self.entry2)
+        self.add_widget(self.calculate_button)
 
-        self.SetSizer(self.sizer)
-        self.Layout()
-
-    def calculate(self, event):
+    def calculate(self, instance):
         try:
-            num_spigots = int(self.entry1.GetValue())
-            num_lid = float(self.entry2.GetValue())
+            num_spigots = int(self.entry1.text)
+            num_lid = float(self.entry2.text)
 
             num_offsets = math.ceil(num_spigots / 2)  # Increase the number of offsets for odd spigots
 
@@ -44,8 +40,10 @@ class SpigotCalculatorPanel(wx.Panel):
 
             message = "\n".join([f"Offset {i + 1}: {offset_values[i]}" for i in range(num_offsets)])
 
-            wx.MessageBox(message, "Offsets", wx.OK | wx.ICON_INFORMATION)
+            popup_content = Label(text=message)
+            popup = Popup(title='Offsets', content=popup_content, size_hint=(None, None), size=(300, 200))
+            popup.open()
 
         except ValueError:
-            wx.MessageBox("Invalid input. Please enter valid numbers.", "Error", wx.OK | wx.ICON_ERROR)
-
+            error_popup = Popup(title='Error', content=Label(text="Invalid input. Please enter valid numbers."), size_hint=(None, None), size=(300, 200))
+            error_popup.open()

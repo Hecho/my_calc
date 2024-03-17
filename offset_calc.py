@@ -1,67 +1,59 @@
-import wx
-import math
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
+from kivy.uix.popup import Popup
 
-class OffsetCalculatorPanel(wx.Panel):
-    def __init__(self, parent):
-        super(OffsetCalculatorPanel, self).__init__(parent)
+class OffsetCalculatorPanel(BoxLayout):
+    def __init__(self, **kwargs):
+        super(OffsetCalculatorPanel, self).__init__(**kwargs)
+        self.orientation = 'vertical'
+        self.padding = [0, 200]  # Adding padding between children vertically
 
-        self.label1 = wx.StaticText(self, label="Enter side A:")
-        self.entry1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        
-        self.label2 = wx.StaticText(self, label="Enter side B:")
-        self.entry2 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.label1 = Label(text="Enter side A:")
+        self.entry1 = TextInput(multiline=False, input_type='number')
 
-        self.label3 = wx.StaticText(self, label="Enter center to center offset:")
-        self.entry3 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.label2 = Label(text="Enter side B:")
+        self.entry2 = TextInput(multiline=False, input_type='number')
 
-        self.calculate_button = wx.Button(self, label="Calculate")
-        self.calculate_button.Bind(wx.EVT_BUTTON, self.calculate)
+        self.label3 = Label(text="Enter center to center offset:")
+        self.entry3 = TextInput(multiline=False, input_type='number')
 
-        # Bind the Enter key in entry1 to move focus to entry2
-        self.entry1.Bind(wx.EVT_TEXT_ENTER, lambda event: self.entry2.SetFocus())
+        self.calculate_button = Button(text="Calculate")
+        self.calculate_button.bind(on_press=self.calculate)
 
-        # Bind the Enter key in entry2 to move focus to entry3
-        self.entry2.Bind(wx.EVT_TEXT_ENTER, lambda event: self.entry3.SetFocus())
+        self.add_widget(self.label1)
+        self.add_widget(self.entry1)
+        self.add_widget(self.label2)
+        self.add_widget(self.entry2)
+        self.add_widget(self.label3)
+        self.add_widget(self.entry3)
+        self.add_widget(self.calculate_button)
 
-        # Bind the Enter key press in the last TextCtrl to the calculate method
-        self.entry3.Bind(wx.EVT_TEXT_ENTER, self.calculate)
-
-        self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.sizer.Add(self.label1, 0, wx.ALL, 5)
-        self.sizer.Add(self.entry1, 0, wx.EXPAND|wx.ALL, 5)
-        self.sizer.Add(self.label2, 0, wx.ALL, 5)
-        self.sizer.Add(self.entry2, 0, wx.EXPAND|wx.ALL, 5)
-        self.sizer.Add(self.label3, 0, wx.ALL, 5)  # Adding label3 to the sizer
-        self.sizer.Add(self.entry3, 0, wx.EXPAND|wx.ALL, 5)  # Adding entry3 to the sizer
-        self.sizer.Add(self.calculate_button, 0, wx.ALL, 5)
-
-        self.SetSizer(self.sizer)
-        self.Layout()
-
-
-    def calculate(self, event):
+    def calculate(self, instance):
         try:
-            num1 = float(self.entry1.GetValue())
-            num2 = float(self.entry2.GetValue())
-            num3 = float(self.entry3.GetValue())
-            Left_offset = round((0 - (num1 / 2)) + num3 + (num2 / 2), 2)
-            Right_offset = round((0 + (num1 / 2)) + num3 - (num2 / 2), 2)
-
+            num1 = float(self.entry1.text)
+            num2 = float(self.entry2.text)
+            num3 = float(self.entry3.text)
+            left_offset = round((0 - (num1 / 2)) + num3 + (num2 / 2), 2)
+            right_offset = round((0 + (num1 / 2)) + num3 - (num2 / 2), 2)
 
             # Determine the message for the left offset
-            if Left_offset > 0:
-                left_message = f"Left in {(Left_offset)}"
+            if left_offset > 0:
+                left_message = f"Left in {left_offset}"
             else:
-                left_message = f"Left out {(abs(Left_offset))}"
+                left_message = f"Left out {abs(left_offset)}"
 
             # Determine the message for the right offset
-            if Right_offset > 0:
-                right_message = f"Right out {(Right_offset)}"
+            if right_offset > 0:
+                right_message = f"Right out {right_offset}"
             else:
-                right_message = f"Right in {(abs(Right_offset))}"
+                right_message = f"Right in {abs(right_offset)}"
 
-            wx.MessageBox(f"{left_message}\n{right_message}", "Offset", wx.OK | wx.ICON_INFORMATION)
+            popup_content = Label(text=f"{left_message}\n{right_message}")
+            popup = Popup(title='Offset', content=popup_content, size_hint=(None, None), size=(300, 200))
+            popup.open()
+
         except ValueError:
-            wx.MessageBox("Invalid input. Please enter valid numbers.", "Error", wx.OK | wx.ICON_ERROR)
-
-
+            error_popup = Popup(title='Error', content=Label(text="Invalid input. Please enter valid numbers."), size_hint=(None, None), size=(300, 200))
+            error_popup.open()

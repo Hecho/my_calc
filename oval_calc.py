@@ -1,43 +1,42 @@
-import wx
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
+from kivy.uix.popup import Popup
 import math
 
-class OvalCalculatorPanel(wx.Panel):
-    def __init__(self, parent):
-        super(OvalCalculatorPanel, self).__init__(parent)
+class OvalCalculatorPanel(BoxLayout):
+    def __init__(self, **kwargs):
+        super(OvalCalculatorPanel, self).__init__(**kwargs)
+        self.orientation = 'vertical'
+        self.padding = [0, 200]  # Adding padding between children vertically
 
-        self.label1 = wx.StaticText(self, label="Enter restricted size:")
-        self.entry1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        
-        self.label2 = wx.StaticText(self, label="Enter required size:")
-        self.entry2 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        
-        self.calculate_button = wx.Button(self, label="Calculate")
-        self.calculate_button.Bind(wx.EVT_BUTTON, self.calculate)
+        self.label1 = Label(text="Enter restricted size:")
+        self.entry1 = TextInput(multiline=False, input_type='number')
 
-        # Bind the Enter key in entry1 to move focus to entry2
-        self.entry1.Bind(wx.EVT_TEXT_ENTER, lambda event: self.entry2.SetFocus())
+        self.label2 = Label(text="Enter required size:")
+        self.entry2 = TextInput(multiline=False, input_type='number')
 
-        # Bind the Enter key press in the last TextCtrl to the calculate method
-        self.entry2.Bind(wx.EVT_TEXT_ENTER, self.calculate)
+        self.calculate_button = Button(text="Calculate")
+        self.calculate_button.bind(on_press=self.calculate)
 
-        self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.sizer.Add(self.label1, 0, wx.ALL, 5)
-        self.sizer.Add(self.entry1, 0, wx.EXPAND|wx.ALL, 5)
-        self.sizer.Add(self.label2, 0, wx.ALL, 5)
-        self.sizer.Add(self.entry2, 0, wx.EXPAND|wx.ALL, 5)
-        self.sizer.Add(self.calculate_button, 0, wx.ALL, 5)
+        self.add_widget(self.label1)
+        self.add_widget(self.entry1)
+        self.add_widget(self.label2)
+        self.add_widget(self.entry2)
+        self.add_widget(self.calculate_button)
 
-        self.SetSizer(self.sizer)
-        self.Layout()
-
-    def calculate(self, event):
+    def calculate(self, instance):
         try:
-            box = float(self.entry1.GetValue())
+            box = float(self.entry1.text)
             num1 = (box - 15)
-            num2 = float(self.entry2.GetValue())
+            num2 = float(self.entry2.text)
             major_axis = math.floor(num1 + (3.142/2) * (num2 - num1))
             minor_axis = math.floor(num1)
 
-            wx.MessageBox(f"Major axis: {major_axis}\nMinor axis: {minor_axis}", "Oval", wx.OK | wx.ICON_INFORMATION)
+            popup_content = f"Major axis: {major_axis}\nMinor axis: {minor_axis}"
+            popup = Popup(title='Oval', content=Label(text=popup_content), size_hint=(None, None), size=(300, 200))
+            popup.open()
         except ValueError:
-            wx.MessageBox("Invalid input. Please enter valid numbers.", "Error", wx.OK | wx.ICON_ERROR)
+            error_popup = Popup(title='Error', content=Label(text="Invalid input. Please enter valid numbers."), size_hint=(None, None), size=(300, 200))
+            error_popup.open()
