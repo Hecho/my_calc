@@ -92,4 +92,6 @@ def calculate_angle_between_vectors(v1, v2):
     # Convert the angle to degrees
     angle_deg = np.degrees(angle_rad)
 
-    return angle_deg
+    final_angle = 2*(90 - (angle_deg/2))
+
+    return final_angle
