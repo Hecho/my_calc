@@ -63,7 +63,11 @@ class FrustrumCalculatorPanel(wx.Panel):
             tw = float(self.entry4.GetValue())
             td = float(self.entry5.GetValue())
 
-            normal_vector1, normal_vector2 = calculate_normal_vectors(bw, bd, h, tw, td)
+            # Calculate coordinates for the planes
+            A, B, C, D = find_coords(bw, bd, h, tw, td)
+
+            normal_vector1 = calculate_normal_vector(A, B, C)
+            normal_vector2 = calculate_normal_vector(A, C, D)
             
             angle = calculate_angle_between_vectors(normal_vector1, normal_vector2)
             
@@ -73,27 +77,30 @@ class FrustrumCalculatorPanel(wx.Panel):
         except ValueError:
             wx.MessageBox("Invalid input. Please enter valid numbers.", "Error", wx.OK | wx.ICON_ERROR)
             
-def calculate_normal_vectors(bw, bd, h, tw, td):
-    # Calculate the coordinates of the points
-    p1 = np.array([bw/2, bd/2, 0])
-    p2 = np.array([tw/2, td/2, h])
-    p3 = np.array([bw/2, -bd/2, 0])
-    p4 = np.array([-bw/2, bd/2, 0])
+def find_coords(bw,bd,h,tw,td):
+    # A always equals (0,0,0)
+    A = (0,0,0)
+    # find B
+    B = (-bw , 0, 0)
+    # find C
+    C = (-(bw - tw) / 2, (bd - td) / 2, h)
+    # find D
+    D = (0, bd, h)
 
-    # Calculate the vectors
-    v1 = p2 - p1
-    v2 = p3 - p1
-    v3 = p4 - p1
+    return A, B, C, D
 
-    # Calculate the normal vectors
-    normal_vector1 = np.cross(v1, v2)
-    normal_vector2 = np.cross(v1, v3)
+def calculate_normal_vector(A, B, C):
+    # Create vectors AB and AC
+    AB = np.subtract(B, A)
+    AC = np.subtract(C, A)
 
-    # Normalize the normal vectors
-    normal_vector1 = normal_vector1 / np.linalg.norm(normal_vector1)
-    normal_vector2 = normal_vector2 / np.linalg.norm(normal_vector2)
+    # Calculate the cross product of AB and AC
+    normal_vector = np.cross(AB, AC)
 
-    return normal_vector1, normal_vector2
+    # Normalize the normal vector
+    normal_vector = normal_vector / np.linalg.norm(normal_vector)
+
+    return normal_vector
 
 # Test the function
 #bw, bd, h, tw, td = 600, 600, 100, 282, 282
