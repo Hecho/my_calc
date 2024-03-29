@@ -6,50 +6,23 @@ class FrustrumCalculatorPanel(wx.Panel):
     def __init__(self, parent):
         super(FrustrumCalculatorPanel, self).__init__(parent)
 
-        self.label1 = wx.StaticText(self, label="Enter base width:")
-        self.entry1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        
-        self.label2 = wx.StaticText(self, label="Enter base depth:")
-        self.entry2 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        labels = ["Enter base width:", "Enter base depth:", "Enter length:", "Enter top width:", "Enter top depth:"]
+        self.entries = [wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER) for _ in labels]
 
-        self.label3 = wx.StaticText(self, label="Enter length:")
-        self.entry3 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        # Bind the Enter key in each entry to move focus to the next entry
+        for i in range(len(self.entries) - 1):
+            self.entries[i].Bind(wx.EVT_TEXT_ENTER, lambda event: self.entries[i + 1].SetFocus())
 
-        self.label4 = wx.StaticText(self, label="Enter top width:")
-        self.entry4 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-
-        self.label5 = wx.StaticText(self, label="Enter top depth:")
-        self.entry5 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        # Bind the Enter key press in the last TextCtrl to the calculate method
+        self.entries[-1].Bind(wx.EVT_TEXT_ENTER, self.calculate)
 
         self.calculate_button = wx.Button(self, label="Calculate")
         self.calculate_button.Bind(wx.EVT_BUTTON, self.calculate)
 
-        # Bind the Enter key in entry1 to move focus to entry2
-        self.entry1.Bind(wx.EVT_TEXT_ENTER, lambda event: self.entry2.SetFocus())
-
-        # Bind the Enter key in entry2 to move focus to entry3
-        self.entry2.Bind(wx.EVT_TEXT_ENTER, lambda event: self.entry3.SetFocus())
-
-        # Bind the Enter key in entry3 to move focus to entry4
-        self.entry3.Bind(wx.EVT_TEXT_ENTER, lambda event: self.entry4.SetFocus())
-
-        # Bind the Enter key in entry4 to move focus to entry5
-        self.entry4.Bind(wx.EVT_TEXT_ENTER, lambda event: self.entry5.SetFocus())
-
-        # Bind the Enter key press in the last TextCtrl to the calculate method
-        self.entry5.Bind(wx.EVT_TEXT_ENTER, self.calculate)
-
         self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.sizer.Add(self.label1, 0, wx.ALL, 5)
-        self.sizer.Add(self.entry1, 0, wx.EXPAND|wx.ALL, 5)
-        self.sizer.Add(self.label2, 0, wx.ALL, 5)
-        self.sizer.Add(self.entry2, 0, wx.EXPAND|wx.ALL, 5)
-        self.sizer.Add(self.label3, 0, wx.ALL, 5)  # Adding label3 to the sizer
-        self.sizer.Add(self.entry3, 0, wx.EXPAND|wx.ALL, 5)  # Adding entry3 to the sizer
-        self.sizer.Add(self.label4, 0, wx.ALL, 5)
-        self.sizer.Add(self.entry4, 0, wx.EXPAND|wx.ALL, 5)
-        self.sizer.Add(self.label5, 0, wx.ALL, 5)
-        self.sizer.Add(self.entry5, 0, wx.EXPAND|wx.ALL, 5)
+        for label, entry in zip(labels, self.entries):
+            self.sizer.Add(wx.StaticText(self, label=label), 0, wx.ALL, 5)
+            self.sizer.Add(entry, 0, wx.EXPAND|wx.ALL, 5)
         self.sizer.Add(self.calculate_button, 0, wx.ALL, 5)
         
         self.SetSizer(self.sizer)
@@ -57,11 +30,11 @@ class FrustrumCalculatorPanel(wx.Panel):
     
     def calculate(self, event):
         try:
-            bw = float(self.entry1.GetValue())
-            bd = float(self.entry2.GetValue())
-            h = float(self.entry3.GetValue())
-            tw = float(self.entry4.GetValue())
-            td = float(self.entry5.GetValue())
+            bw = float(self.entries[0].GetValue())
+            bd = float(self.entries[1].GetValue())
+            h = float(self.entries[2].GetValue())
+            tw = float(self.entries[3].GetValue())
+            td = float(self.entries[4].GetValue())
 
             # Calculate coordinates for the planes
             A, B, C, D = find_coords(bw, bd, h, tw, td)
@@ -102,12 +75,6 @@ def calculate_normal_vector(A, B, C):
 
     return normal_vector
 
-# Test the function
-#bw, bd, h, tw, td = 600, 600, 100, 282, 282
-#normal_vector1, normal_vector2 = calculate_normal_vectors(bw, bd, h, tw, td)
-#print("Normal vector of the first plane: ", normal_vector1)
-#print("Normal vector of the second plane: ", normal_vector2)
-
 def calculate_angle_between_vectors(v1, v2):
     # Calculate the dot product
     dot_product = np.dot(v1, v2)
@@ -126,8 +93,3 @@ def calculate_angle_between_vectors(v1, v2):
     angle_deg = np.degrees(angle_rad)
 
     return angle_deg
-
-# Test the function
-
-
-    
